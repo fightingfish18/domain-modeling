@@ -2,15 +2,34 @@
 //  main.swift
 //  Domain Modeling
 //
-//  Created by Admin on 10/15/15.
+//  Created by Smyth May on 10/15/15.
 //  Copyright © 2015 Smyth May. All rights reserved.
 //
 
 import Foundation
 
-struct Money {
+extension Double {
+    var usd : Money { return Money(amount: self, currency: "USD"); }
+    var eur : Money { return Money(amount: self, currency: "EUR"); }
+    var gbp : Money { return Money(amount: self, currency: "GBP"); }
+    var can : Money { return Money(amount: self, currency: "CAN"); }
+}
+
+protocol Mathematics {
+    func add(other : Money) -> Money;
+    func subtract(other : Money) -> Money;
+}
+
+struct Money : Mathematics, CustomStringConvertible {
     var amount : Double;
     var currency : String;
+    var description : String;
+    
+    init(amount : Double, currency : String) {
+        self.amount = amount;
+        self.currency = currency;
+        self.description = "\(self.amount)\(self.currency)";
+    }
     
     func add(other : Money) -> Money {
         var toAdd = other;
@@ -94,15 +113,17 @@ struct Money {
     }
 }
 
-class Job {
+class Job : CustomStringConvertible {
     var title : String;
     var salary : Double;
     var salaryType : String;
+    var description : String
     
     init(title: String, salary : Double, salaryType : String) {
         self.title = title;
         self.salary = salary;
         self.salaryType = salaryType;
+        self.description = "\(self.title) - \(self.salary) / \(self.salaryType)"
     }
     
     func calculateIncom(hours : Double) -> Double {
@@ -118,17 +139,19 @@ class Job {
     }
 }
 
-class Person {
+class Person : CustomStringConvertible {
     var firstName : String;
     var lastName : String;
     var age : Int;
     var job : Job?;
     var spouse : Person?;
+    var description : String;
     
     init(firstName : String, lastName : String, age : Int, job : Job?, spouse : Person?) {
         self.firstName = firstName;
         self.lastName = lastName;
         self.age = age;
+        self.description = "";
         if let _ = job {
             if (self.age >= 16) {
                 self.job = job;
@@ -149,6 +172,7 @@ class Person {
         } else {
             self.spouse = nil;
         }
+        self.description = toString();
     }
     
     func toString() -> String {
@@ -165,10 +189,11 @@ class Person {
     
 }
 
-class Family {
+class Family : CustomStringConvertible {
     var members : [Person];
     var familyIncome : Double;
     var legal : Bool;
+    var description : String;
     
     init(members : [Person]) {
         self.members = members;
@@ -182,6 +207,7 @@ class Family {
                 self.familyIncome += person.job!.salary;
             }
         }
+        self.description = "Members: \(self.members), income: \(self.familyIncome), legality: \(self.legal)";
     }
     
     func householdIncome() -> Double {
@@ -218,6 +244,7 @@ print("Result: \(m3.amount) \(m3.currency)");
 print("Let's take it away now...");
 let m4 = m3.subtract(m2);
 print("Result: \(m4.amount) \(m4.currency)");
+print("These are also examples of the new Mathematics Protocol");
 print("");
 print("Let's make a person");
 var p1 = Person(firstName: "John", lastName : "Doe", age : 30, job : Job(title: "Developer", salary : 75000.0, salaryType : "Yearly"), spouse : nil);
@@ -234,5 +261,20 @@ f1.haveChild("Jimmy", lastName : "Doe");
 var k1 = f1.members[2];
 print("Oh, they just had a kid - \(k1.toString())");
 print("Their family size is now \(f1.members.count)");
+
+/*
+Testing part two!!
+*/
+print("");
+print("part two tests");
+print("CustomStringConvertible extensions!");
+print("\(m2.description) is description for money 2");
+print("\(p1.description) is an example of a person description");
+print("\(f1.description) is a family description");
+print("");
+print("Testing double extension");
+var dbl = 1.5;
+print("double: \(dbl)")
+print("To Money... \(dbl.usd)");
 
 
